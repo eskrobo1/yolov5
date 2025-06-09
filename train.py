@@ -29,6 +29,7 @@ try:
     import comet_ml  # must be imported before torch (if installed)
 except ImportError:
     comet_ml = None
+from comet_ml import start
 
 import numpy as np
 import torch
@@ -99,6 +100,27 @@ RANK = int(os.getenv("RANK", -1))
 WORLD_SIZE = int(os.getenv("WORLD_SIZE", 1))
 GIT_INFO = check_git_info()
 
+global experiment
+experiment = start(
+  api_key="AsJ8pQjhhvhvNanGqvAOEaLcU",
+  project_name="general",
+  workspace="eskrobo1"
+)
+
+hyper_params = {
+    "learning_rate": 0.5,
+    "steps": 100000,
+    "batch_size": 50,
+}
+experiment.log_parameters(hyper_params)
+
+# Or report single hyperparameters:
+hidden_layer_size = 50
+experiment.log_parameter("hidden_layer_size", hidden_layer_size)
+
+# Long any time-series metrics:
+train_accuracy = 3.14
+experiment.log_metric("accuracy", train_accuracy, step=0)
 
 def train(hyp, opt, device, callbacks):
     """
@@ -467,6 +489,15 @@ def train(hyp, opt, device, callbacks):
                     callbacks=callbacks,
                     compute_loss=compute_loss,
                 )
+                experiment.log_metrics({
+                    "precision": results[0],
+                    "recall": results[1],
+                    "mAP_0.5": results[2],
+                    "mAP_0.5_0.95": results[3]
+                }, step=epoch)
+                confusion_matrix_path = save_dir / 'confusion_matrix.png'
+                if confusion_matrix_path.exists():
+                    experiment.log_image(str(confusion_matrix_path), name=f"Confusion Matrix Epoch {epoch}")
 
             # Update best mAP
             fi = fitness(np.array(results).reshape(1, -1))  # weighted combination of [P, R, mAP@.5, mAP@.5-.95]
@@ -534,7 +565,18 @@ def train(hyp, opt, device, callbacks):
                     )  # val best model with plots
                     if is_coco:
                         callbacks.run("on_fit_epoch_end", list(mloss) + list(results) + lr, epoch, best_fitness, fi)
-
+        experiment.log_metrics({
+            "precision": results[0],
+            "recall": results[1],
+            "mAP_0.5": results[2],
+            "mAP_0.5_0.95": results[3],
+            "val_loss_cls": results[4],
+            "val_loss_box": results[5],
+            "val_loss_obj": results[6],
+            "train_loss_box": mloss[0].item(),
+            "train_loss_obj": mloss[1].item(),
+            "train_loss_cls": mloss[2].item()
+        }, step=epoch)
         callbacks.run("on_train_end", last, best, epoch, results)
 
     torch.cuda.empty_cache()
