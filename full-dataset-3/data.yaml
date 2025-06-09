@@ -1,0 +1,33 @@
+names:
+- box
+- coca cola bottle
+- drone
+- fanta bottle
+- fanta bottle shokata
+- fruc bottle
+- fructal tetrapak borovnica
+- fructal tetrapak jabuka
+- fructal tetrapak kruska
+- fructal tetrapak mrkva naranca limun
+- juicy tetrapak jabuka
+- juicy tetrapak ribizla
+- master tetrapak naranca ananas mrkva
+- master tetrapak sumsko voce
+- rauch bottle jabuka
+- rauch bottle jagoda
+- takovo tetrapak
+- to tetrapak breskva jabuka
+- to tetrapak naranca
+- to tetrapak sumsko voce
+- undefined
+- verde tetrapak
+nc: 22
+roboflow:
+  license: CC BY 4.0
+  project: full-dataset-efwvl
+  url: https://universe.roboflow.com/inventorydetection/full-dataset-efwvl/dataset/3
+  version: 3
+  workspace: inventorydetection
+test: ../test/images
+train: full-dataset-3/train/images
+val: full-dataset-3/valid/images
