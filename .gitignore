@@ -252,3 +252,8 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
+*.mp4
+*.avi
+*.mov
+runs/detect/exp*/videos/
+runs/detect/exp*/*.mp4
